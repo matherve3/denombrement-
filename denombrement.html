@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>Fiche Interactive · Dénombrement</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            --bg: #0a0a1a; --surface: #13132b; --surface2: #1a1a35;
+            --primary: #eab308; --primary-light: #fde047; --text: #f1f5f9;
+            --text-secondary: #94a3b8; --border: #2d2d5e;
+            --success: #10b981; --danger: #ef4444; --info: #3b82f6;
+            --radius: 16px; --radius-sm: 12px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse at 20% 30%, rgba(234,179,8,0.08) 0%, transparent 50%),
+                              radial-gradient(ellipse at 80% 70%, rgba(59,130,246,0.08) 0%, transparent 50%);
+            font-family: 'Inter', system-ui, sans-serif; min-height: 100vh;
+            display: flex; justify-content: center; padding: 1rem;
+        }
+        .container {
+            width: 100%; max-width: 850px; background: var(--surface);
+            border-radius: 28px; border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            padding: 2rem 1.5rem; margin: 1rem 0;
+        }
+        h1 { text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 800; color: var(--primary-light); margin-bottom: 0.3rem; }
+        .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem; }
+        .accordion { margin-bottom: 1rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+        .accordion-header {
+            background: var(--surface2); padding: 1rem 1.3rem;
+            font-weight: 700; font-size: 1.1rem; color: var(--text); cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background 0.2s;
+        }
+        .accordion-header:hover { background: #252550; }
+        .accordion-header span { font-size: 1.2rem; color: var(--primary); }
+        .accordion-body {
+            background: #0c0c20; max-height: 0; overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.5s ease;
+            color: var(--text-secondary); line-height: 1.7;
+        }
+        .accordion-body.open { max-height: 3000px; padding: 1.5rem 1.3rem; }
+        .accordion-body p { margin-bottom: 1rem; }
+        .accordion-body strong { color: var(--text); }
+        .property-box {
+            background: rgba(59,130,246,0.1); border-left: 4px solid var(--info);
+            padding: 0.8rem 1.2rem; border-radius: var(--radius-sm); margin: 1rem 0;
+        }
+        .property-box .title {
+            font-weight: 700; color: var(--info); margin-bottom: 0.4rem;
+            font-size: 1rem;
+        }
+        .formula {
+            background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.2);
+            padding: 0.4rem 1rem; border-radius: 8px; display: inline-block;
+            margin: 0.3rem 0; font-family: 'KaTeX_Main', serif;
+        }
+        .question-box {
+            background: var(--surface2); border-radius: var(--radius-sm);
+            padding: 1.2rem; margin-top: 1.5rem; border-left: 4px solid var(--primary);
+        }
+        .question-box p { margin-bottom: 0.5rem; }
+        .option-btn {
+            display: block; width: 100%; text-align: left; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 1rem;
+            margin: 0.4rem 0; color: var(--text); cursor: pointer; font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .option-btn:hover:not(:disabled) { background: rgba(234,179,8,0.1); border-color: var(--primary); }
+        .option-btn.correct { background: #065f46; border-color: var(--success); font-weight: 600; }
+        .option-btn.wrong { background: #7f1d1d; border-color: var(--danger); font-weight: 600; }
+        .feedback { margin-top: 0.6rem; font-size: 0.9rem; font-weight: 600; }
+        .copyright { text-align: center; margin-top: 2.5rem; font-size: 0.75rem; color: var(--text-secondary); opacity: 0.7; }
+        @media (max-width: 500px) {
+            .container { padding: 1.2rem 0.8rem; }
+            h1 { font-size: 1.5rem; }
+            .accordion-header { padding: 0.8rem 1rem; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎲 Dénombrement</h1>
+    <p class="subtitle">Fiche interactive complète · Terminale</p>
+
+    <!-- SECTION 1 : Permutations et factorielle -->
+    <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            🔹 1. Permutations & factorielle <span>▶</span>
+        </div>
+        <div class="accordion-body">
+            <p><strong>Définition :</strong> Une permutation d'un ensemble à $n$ éléments est un arrangement ordonné de ces $n$ éléments. Le nombre de permutations est $n! = n \times (n-1) \times \cdots \times 1$.</p>
+            <div class="property-box">
+                <div class="title">📌 Propriétés</div>
+                <p>$0! = 1$, $1! = 1$.</p>
+                <p>Nombre de façons de classer $n$ objets distincts : $n!$.</p>
+            </div>
+            <div class="question-box" id="q1">
+                <p><strong>❓ Question 1 :</strong> Combien d'anagrammes du mot "MATH" (4 lettres distinctes) ?</p>
+                <button class="option-btn" onclick="checkAnswer('q1',0)">A. 12</button>
+                <button class="option-btn" onclick="checkAnswer('q1',1)">B. 24</button>
+                <button class="option-btn" onclick="checkAnswer('q1',2)">C. 120</button>
+                <div class="feedback" id="fb1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2 : Arrangements -->
+    <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            🔹 2. Arrangements <span>▶</span>
+        </div>
+        <div class="accordion-body">
+            <p><strong>Définition :</strong> Un arrangement est une sélection ordonnée de $k$ éléments parmi $n$ ($k \le n$), sans répétition.</p>
+            <div class="property-box">
+                <div class="title">📐 Formule</div>
+                <p>$A_n^k = n \times (n-1) \times \cdots \times (n-k+1) = \frac{n!}{(n-k)!}$.</p>
+                <p>Exemple : le nombre de tiercés possibles avec 20 chevaux (ordre important, sans ex-aequo) est $A_{20}^3 = 20 \times 19 \times 18 = 6840$.</p>
+            </div>
+            <div class="question-box" id="q2">
+                <p><strong>❓ Question 2 :</strong> $A_5^2 =$ ?</p>
+                <button class="option-btn" onclick="checkAnswer('q2',0)">A. 10</button>
+                <button class="option-btn" onclick="checkAnswer('q2',1)">B. 20</button>
+                <button class="option-btn" onclick="checkAnswer('q2',2)">C. 25</button>
+                <div class="feedback" id="fb2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3 : Combinaisons -->
+    <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            🔹 3. Combinaisons & binôme <span>▶</span>
+        </div>
+        <div class="accordion-body">
+            <p><strong>Définition :</strong> Une combinaison est un choix non ordonné de $k$ éléments parmi $n$.</p>
+            <div class="property-box">
+                <div class="title">📌 Coefficient binomial</div>
+                <p>$\binom{n}{k} = \frac{n!}{k!(n-k)!} = \frac{A_n^k}{k!}$.</p>
+                <p>Symétrie : $\binom{n}{k} = \binom{n}{n-k}$.</p>
+                <p>Formule du binôme : $(a+b)^n = \sum_{k=0}^n \binom{n}{k} a^k b^{n-k}$.</p>
+                <p>Triangle de Pascal : $\binom{n}{k} + \binom{n}{k+1} = \binom{n+1}{k+1}$.</p>
+            </div>
+            <div class="question-box" id="q3">
+                <p><strong>❓ Question 3 :</strong> $\binom{5}{2} =$ ?</p>
+                <button class="option-btn" onclick="checkAnswer('q3',0)">A. 10</button>
+                <button class="option-btn" onclick="checkAnswer('q3',1)">B. 20</button>
+                <button class="option-btn" onclick="checkAnswer('q3',2)">C. 5</button>
+                <div class="feedback" id="fb3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4 : Dénombrement et probabilités -->
+    <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            🔹 4. Dénombrement & Probabilités <span>▶</span>
+        </div>
+        <div class="accordion-body">
+            <p><strong>Principe :</strong> Dans un univers équiprobable, $P(A) = \frac{\text{nombre de cas favorables}}{\text{nombre de cas possibles}}$.</p>
+            <div class="property-box">
+                <div class="title">📐 Exemples</div>
+                <p>• Lancer de deux dés : 36 issues, probabilité d'un double = $\frac{6}{36} = \frac{1}{6}$.</p>
+                <p>• Tirage sans remise de 2 cartes dans un jeu de 32 : nombre de mains = $\binom{32}{2} = 496$.</p>
+            </div>
+            <div class="question-box" id="q4">
+                <p><strong>❓ Question 4 :</strong> Dans une urne de 3 boules rouges et 5 bleues, on tire 2 boules sans remise. Probabilité d'obtenir 2 rouges ?</p>
+                <button class="option-btn" onclick="checkAnswer('q4',0)">A. $\frac{3}{28}$</button>
+                <button class="option-btn" onclick="checkAnswer('q4',1)">B. $\frac{3}{8}$</button>
+                <button class="option-btn" onclick="checkAnswer('q4',2)">C. $\frac{9}{64}$</button>
+                <div class="feedback" id="fb4"></div>
+            </div>
+        </div>
+    </div>
+
+    <p class="copyright">©️ MATHERVE · Fiches interactives Terminale</p>
+</div>
+
+<script>
+    const answers = {
+        q1: 1, // 24
+        q2: 1, // 20
+        q3: 0, // 10
+        q4: 0  // 3/28
+    };
+
+    function toggleAccordion(header) {
+        const body = header.nextElementSibling;
+        body.classList.toggle('open');
+        const span = header.querySelector('span');
+        span.textContent = body.classList.contains('open') ? '▼' : '▶';
+        if (body.classList.contains('open')) {
+            renderMathInElement(body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        }
+    }
+
+    function checkAnswer(questionId, chosen) {
+        const buttons = document.querySelectorAll(`#${questionId} .option-btn`);
+        buttons.forEach((btn, idx) => {
+            btn.classList.remove('correct', 'wrong');
+            btn.disabled = true;
+            if (idx === answers[questionId]) btn.classList.add('correct');
+            if (idx === chosen && chosen !== answers[questionId]) btn.classList.add('wrong');
+        });
+        const fb = document.getElementById('fb' + questionId.slice(1));
+        fb.textContent = chosen === answers[questionId]
+            ? '✅ Bonne réponse !'
+            : '❌ Réponse incorrecte. Relis la fiche ci-dessus.';
+        fb.style.color = chosen === answers[questionId] ? 'var(--success)' : 'var(--danger)';
+    }
+
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+</script>
+</body>
+</html>
